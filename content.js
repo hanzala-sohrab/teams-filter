@@ -5,7 +5,7 @@
 
   const STORAGE_KEY = 'teamsFilterBlockedUsers';
   const ATTR_PROCESSED = 'data-tf-processed';
-  const ATTR_HIDDEN    = 'data-tf-hidden';
+  const ATTR_HIDDEN = 'data-tf-hidden';
 
   let blockedUsers = [];
   let mutationObserver = null;
@@ -65,7 +65,7 @@
       if (t && t.length < 80 && !t.includes('\n')) return t;
     }
 
-    // 4. Avatar image aria-label → "Triptee Gupta's avatar" or "Triptee Gupta"
+    // 4. Avatar image aria-label → "User's avatar" or "User's name"
     const img = rootEl.querySelector(
       'img[aria-label], [role="img"][aria-label], [aria-label*="avatar"], [aria-label*="photo"]'
     );
