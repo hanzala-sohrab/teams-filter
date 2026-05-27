@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Teams Message Filter</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #1e1e2e;
+      --surface: #2a2a3d;
+      --border: #3a3a52;
+      --accent: #6264a7;
+      --accent-hover: #7b7cc0;
+      --danger: #c4314b;
+      --danger-hover: #da364f;
+      --text: #e0e0f0;
+      --text-muted: #8888aa;
+      --radius: 8px;
+    }
+
+    body {
+      width: 340px;
+      min-height: 200px;
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Segoe UI', system-ui, sans-serif;
+      font-size: 14px;
+    }
+
+    /* ── Header ─────────────────────────────────────────────── */
+    .header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 16px 16px 12px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .header-icon {
+      width: 28px;
+      height: 28px;
+      background: var(--accent);
+      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .header-icon svg {
+      width: 16px;
+      height: 16px;
+      fill: #fff;
+    }
+
+    .header-title {
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--text);
+    }
+
+    .header-subtitle {
+      font-size: 11px;
+      color: var(--text-muted);
+      margin-top: 1px;
+    }
+
+    /* ── Body ───────────────────────────────────────────────── */
+    .body {
+      padding: 14px 16px;
+    }
+
+    /* ── Add form ───────────────────────────────────────────── */
+    .add-row {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 14px;
+    }
+
+    .add-row input {
+      flex: 1;
+      padding: 7px 10px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      color: var(--text);
+      font-size: 13px;
+      outline: none;
+      transition: border-color 0.15s;
+    }
+
+    .add-row input:focus {
+      border-color: var(--accent);
+    }
+
+    .add-row input::placeholder {
+      color: var(--text-muted);
+    }
+
+    .btn {
+      padding: 7px 14px;
+      border: none;
+      border-radius: var(--radius);
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: background 0.15s;
+    }
+
+    .btn-primary {
+      background: var(--accent);
+      color: #fff;
+    }
+
+    .btn-primary:hover { background: var(--accent-hover); }
+    .btn-primary:disabled { opacity: 0.5; cursor: not-allowed; }
+
+    /* ── User list ──────────────────────────────────────────── */
+    .section-label {
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--text-muted);
+      margin-bottom: 8px;
+    }
+
+    #user-list {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      max-height: 260px;
+      overflow-y: auto;
+    }
+
+    #user-list:empty::after {
+      content: 'No people filtered yet.';
+      display: block;
+      color: var(--text-muted);
+      font-size: 13px;
+      padding: 8px 0;
+      text-align: center;
+    }
+
+    .user-chip {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 7px 10px;
+      animation: slide-in 0.15s ease;
+    }
+
+    @keyframes slide-in {
+      from { opacity: 0; transform: translateY(-4px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .user-name {
+      font-size: 13px;
+      color: var(--text);
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      max-width: 220px;
+    }
+
+    .remove-btn {
+      background: none;
+      border: none;
+      padding: 2px 4px;
+      cursor: pointer;
+      border-radius: 4px;
+      color: var(--text-muted);
+      transition: color 0.15s, background 0.15s;
+      line-height: 1;
+      flex-shrink: 0;
+    }
+
+    .remove-btn:hover {
+      color: var(--danger-hover);
+      background: rgba(196, 49, 75, 0.12);
+    }
+
+    /* ── Footer ─────────────────────────────────────────────── */
+    .footer {
+      padding: 10px 16px 14px;
+      color: var(--text-muted);
+      font-size: 11px;
+      border-top: 1px solid var(--border);
+      margin-top: 14px;
+    }
+
+    /* scrollbar */
+    #user-list::-webkit-scrollbar { width: 4px; }
+    #user-list::-webkit-scrollbar-track { background: transparent; }
+    #user-list::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+  </style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-icon">
+    <svg viewBox="0 0 20 20"><path d="M10 1a9 9 0 1 0 0 18A9 9 0 0 0 10 1zm0 16a7 7 0 1 1 0-14 7 7 0 0 1 0 14zm-1-9h2v5H9V8zm0-3h2v2H9V5z"/></svg>
+  </div>
+  <div>
+    <div class="header-title">Teams Message Filter</div>
+    <div class="header-subtitle">Hide messages from specific people</div>
+  </div>
+</div>
+
+<div class="body">
+  <div class="add-row">
+    <input type="text" id="name-input" placeholder="Display name (e.g. John Smith)" autocomplete="off" />
+    <button class="btn btn-primary" id="add-btn">Add</button>
+  </div>
+
+  <div class="section-label">Filtered people</div>
+  <div id="user-list"></div>
+</div>
+
+<div class="footer">
+  Messages from these people will be hidden on Teams.&nbsp;
+  Reload the Teams tab after adding names.
+</div>
+
+<script src="popup.js"></script>
+</body>
+</html>
